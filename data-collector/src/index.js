@@ -5,7 +5,7 @@ const { ethers } = require('ethers')
 const { CrossChainMessenger, ETHBridgeAdapter, StandardBridgeAdapter } = require('@eth-optimism/sdk')
 const contracts = require('./contracts')
 
-const db = new Sequelize.Sequelize(`postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@db:5432/${process.env.DB_NAME}`, {
+const db = new Sequelize.Sequelize('postgres://user:example@db:5432/tokens-data', {
     logging: false,
 })
 
@@ -368,4 +368,4 @@ main().then(res => {
     console.log(res)
 }).catch(error => {
     console.error(error)
-}) 
+})

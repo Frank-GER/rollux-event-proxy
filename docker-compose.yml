@@ -1,27 +1,33 @@
 version: '3.8'
+
 services:
   api-gateway:
     restart: always
-    build: ./api-gateway
+    build: ./api-gateway/
+    container_name: 'api-gateway'
     depends_on:
       - db
     volumes:
       - ./api-gateway/src:/var/api-gateway/src
     environment:
-      - DB_USER=user
+      - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
     ports:
       - "8080:8080"
+
   data-collector:
     restart: always
     build: ./data-collector/
+    container_name: 'data-collector'
     depends_on:
       - db
-    volumes: 
+    volumes:
       - ./data-collector/src:/var/data-collector/src
+    env_file:
+      -  ./.env
     environment:
-      - DB_USER=user
+      - DB_USERNAME=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
       - L1_RPC_URL=${L1_RPC_URL}
@@ -34,16 +40,17 @@ services:
       - DATA_COLLECTOR_ENABLE_WATHCHER=${DATA_COLLECTOR_ENABLE_WATHCHER}
       - DATA_COLLECTOR_INITIAL_CHECK_TIMEOUT=${DATA_COLLECTOR_INITIAL_CHECK_TIMEOUT}
       - DATA_COLLECTOR_BEFORE_UNLOCK_TIMEOUT=${DATA_COLLECTOR_BEFORE_UNLOCK_TIMEOUT}
+
   db:
-    build: ./database
-    ports:
-      - '5433:${DB_PORT}'
+    build: ./database/
+    container_name: 'l2-api-db'
+#    ports:
+#      - '5432:${DB_PORT}'
     volumes:
-      - data:/database/db
+      - "${HOME}/l2-api/db-data:/var/lib/postgresql/data"
+    env_file:
+      -  ./.env
     environment:
-      - POSTGRES_USER=user
+      - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
-
-volumes:
-  data: {}
